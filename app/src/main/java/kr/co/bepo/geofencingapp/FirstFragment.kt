@@ -15,10 +15,7 @@ import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.model.PlaceLikelihood
 import com.google.android.libraries.places.api.model.TypeFilter
-import com.google.android.libraries.places.api.net.FetchPlaceRequest
-import com.google.android.libraries.places.api.net.FetchPlaceResponse
-import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest
-import com.google.android.libraries.places.api.net.PlacesClient
+import com.google.android.libraries.places.api.net.*
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
 import kr.co.bepo.geofencingapp.databinding.FragmentFirstBinding
@@ -78,7 +75,7 @@ class FirstFragment : Fragment() {
     private fun getCurrentPlaceLocations() {
 
         // Use fields to define the data types to return.
-        val placeFields: List<Place.Field> = listOf(Place.Field.NAME, Place.Field.ID)
+        val placeFields: List<Place.Field> = listOf(Place.Field.NAME, Place.Field.ID, Place.Field.PHOTO_METADATAS)
 
         // Use the builder to create a FindCurrentPlaceRequest.
         val request: FindCurrentPlaceRequest = FindCurrentPlaceRequest.newInstance(placeFields)
@@ -123,7 +120,8 @@ class FirstFragment : Fragment() {
             Place.Field.NAME,
             Place.Field.ADDRESS,
             Place.Field.BUSINESS_STATUS,
-            Place.Field.OPENING_HOURS
+            Place.Field.OPENING_HOURS,
+            Place.Field.PHOTO_METADATAS
         )
 
         // Construct a request object, passing the place ID and fields array.
@@ -139,6 +137,33 @@ class FirstFragment : Fragment() {
                             "Business Status: ${place.businessStatus}, " +
                             "Opening Hours: ${place.openingHours}"
                 )
+
+                // Get the photo metadata.
+                val metada = place.photoMetadatas
+                if (metada == null || metada.isEmpty()) {
+                    Log.w("TAG", "No photo metadata.")
+                    return@addOnSuccessListener
+                }
+                val photoMetadata = metada.first()
+
+                // Get the attribution text.
+                val attributions = photoMetadata?.attributions
+
+                // Create a FetchPhotoRequest.
+                val photoRequest = FetchPhotoRequest.builder(photoMetadata)
+                    .setMaxWidth(500) // Optional.
+                    .setMaxHeight(300) // Optional.
+                    .build()
+                placesClient.fetchPhoto(photoRequest)
+                    .addOnSuccessListener { fetchPhotoResponse: FetchPhotoResponse ->
+                        val bitmap = fetchPhotoResponse.bitmap
+                        binding.imageView.setImageBitmap(bitmap)
+                    }.addOnFailureListener { exception: Exception ->
+                        if (exception is ApiException) {
+                            Log.e("TAG", "Place not found: " + exception.message)
+                            val statusCode = exception.statusCode
+                        }
+                    }
             }.addOnFailureListener { exception: Exception ->
                 if (exception is ApiException) {
                     Log.e("TAG", "Place not found: ${exception.message}")
