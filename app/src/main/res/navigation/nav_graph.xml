@@ -15,6 +15,9 @@
             app:destination="@id/mapsFragment"
             app:popUpTo="@id/permissionFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_permissionFragment_to_add_geofence_graph"
+            app:destination="@id/add_geofence_graph" />
     </fragment>
 
     <fragment
