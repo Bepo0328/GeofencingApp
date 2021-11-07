@@ -1,11 +1,13 @@
-package kr.co.bepo.geofencingapp
+package kr.co.bepo.geofencingapp.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kr.co.bepo.geofencingapp.R
 import kr.co.bepo.geofencingapp.databinding.ActivityMainBinding
+import kr.co.bepo.geofencingapp.ui.permission.PermissionFragmentDirections
 import kr.co.bepo.geofencingapp.util.Permissions
 
 @AndroidEntryPoint
@@ -22,7 +24,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initNavigtaion() = with(binding) {
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.navHostFragment) as NavHostFragment
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.navHostFragment) as NavHostFragment
         navController = navHostFragment.navController
 
         if (Permissions.hasLocationPermission(this@MainActivity)) {

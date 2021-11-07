@@ -1,4 +1,4 @@
-package kr.co.bepo.geofencingapp
+package kr.co.bepo.geofencingapp.data
 
 import android.content.Context
 import androidx.datastore.core.DataStore

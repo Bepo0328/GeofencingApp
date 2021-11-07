@@ -1,4 +1,4 @@
-package kr.co.bepo.geofencingapp
+package kr.co.bepo.geofencingapp.ui.permission
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import com.vmadalin.easypermissions.EasyPermissions
 import com.vmadalin.easypermissions.dialogs.SettingsDialog
 import dagger.hilt.android.AndroidEntryPoint
+import kr.co.bepo.geofencingapp.R
 import kr.co.bepo.geofencingapp.databinding.FragmentPermissionBinding
 import kr.co.bepo.geofencingapp.util.ExtensionFunctions.observeOnce
 import kr.co.bepo.geofencingapp.util.Permissions

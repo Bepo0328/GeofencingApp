@@ -4,11 +4,10 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.room.PrimaryKey
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kr.co.bepo.geofencingapp.DataStoreRepository
+import kr.co.bepo.geofencingapp.data.DataStoreRepository
 import javax.inject.Inject
 
 @HiltViewModel
