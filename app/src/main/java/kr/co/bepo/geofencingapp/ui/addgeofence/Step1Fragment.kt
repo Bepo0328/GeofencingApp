@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.common.api.ApiException
@@ -23,6 +24,7 @@ import kr.co.bepo.geofencingapp.databinding.FragmentPermissionBinding
 import kr.co.bepo.geofencingapp.databinding.FragmentStep1Binding
 import kr.co.bepo.geofencingapp.util.Permissions
 import kr.co.bepo.geofencingapp.viewmodels.SharedViewModel
+import kr.co.bepo.geofencingapp.viewmodels.Step1ViewModel
 
 class Step1Fragment : Fragment() {
 
@@ -30,6 +32,7 @@ class Step1Fragment : Fragment() {
     private val binding get() = _binding!!
 
     private val sharedViewModel: SharedViewModel by activityViewModels()
+    private val step1ViewModel: Step1ViewModel by viewModels()
 
     private lateinit var geoCoder: Geocoder
     private lateinit var placesClient: PlacesClient
@@ -56,7 +59,14 @@ class Step1Fragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        initViewModels()
         initViews()
+    }
+
+    private fun initViewModels() = with(binding) {
+        sharedViewModel = sharedViewModel
+        step1ViewModel = step1ViewModel
+        lifecycleOwner = this@Step1Fragment
     }
 
     private fun initViews() = with(binding) {
@@ -89,14 +99,22 @@ class Step1Fragment : Fragment() {
                         latLng.longitude,
                         1
                     )
-                    sharedViewModel.geoName = address[0].countryCode
+                    sharedViewModel.geoCountryCode = address[0].countryCode
                 } else {
                     val exception = task.exception
                     if (exception is ApiException) {
                         Log.e("Step1Fragment", exception.statusCode.toString())
                     }
                 }
+                enableNextButton()
             }
         }
     }
+
+    private fun enableNextButton() {
+        if (sharedViewModel.geoName.isNotEmpty()) {
+            step1ViewModel.enableNextButton(true)
+        }
+    }
+
 }
