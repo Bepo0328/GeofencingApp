@@ -40,11 +40,15 @@ class PermissionFragment : Fragment(), EasyPermissions.PermissionCallbacks {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.continueButton.setOnClickListener {
+        initButton()
+    }
+
+    private fun initButton() = with(binding) {
+        continueButton.setOnClickListener {
             if (Permissions.hasLocationPermission(requireContext())) {
                 checkFirstLaunch()
             } else {
-                Permissions.requestLocationPermission(this)
+                Permissions.requestLocationPermission(this@PermissionFragment)
             }
         }
     }

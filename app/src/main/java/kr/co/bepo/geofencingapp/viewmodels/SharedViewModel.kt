@@ -18,6 +18,9 @@ class SharedViewModel @Inject constructor(
 
     val app = application
 
+    var geoName = "Default"
+    var geoCountryCode = ""
+
     // DataStore
     val readFirstLaunch = dataStoreRepository.readFirstLaunch.asLiveData()
 
