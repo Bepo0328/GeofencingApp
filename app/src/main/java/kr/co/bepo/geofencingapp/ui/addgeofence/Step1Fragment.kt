@@ -4,25 +4,24 @@ import android.annotation.SuppressLint
 import android.location.Geocoder
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.location.GeofenceStatusCodes
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 import kotlinx.coroutines.launch
 import kr.co.bepo.geofencingapp.R
-import kr.co.bepo.geofencingapp.databinding.FragmentPermissionBinding
 import kr.co.bepo.geofencingapp.databinding.FragmentStep1Binding
-import kr.co.bepo.geofencingapp.util.Permissions
 import kr.co.bepo.geofencingapp.viewmodels.SharedViewModel
 import kr.co.bepo.geofencingapp.viewmodels.Step1ViewModel
 
@@ -59,14 +58,7 @@ class Step1Fragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        initViewModels()
         initViews()
-    }
-
-    private fun initViewModels() = with(binding) {
-        sharedViewModel = sharedViewModel
-        step1ViewModel = step1ViewModel
-        lifecycleOwner = this@Step1Fragment
     }
 
     private fun initViews() = with(binding) {
@@ -75,12 +67,13 @@ class Step1Fragment : Fragment() {
         }
 
         getCountryCodeFromCurrentLocation()
+        onTextChanged()
+        step1NextClicked()
     }
 
     private fun onStep1BackClicked() {
         val action = Step1FragmentDirections.actionStep1FragmentToMapsFragment()
         findNavController().navigate(action)
-
     }
 
     @SuppressLint("MissingPermission")
@@ -117,4 +110,31 @@ class Step1Fragment : Fragment() {
         }
     }
 
+    private fun onTextChanged() = with(binding) {
+        geofenceNameEt.setText(sharedViewModel.geoName)
+        Log.d("onTextChanged", sharedViewModel.geoName)
+        geofenceNameEt.doOnTextChanged { text, _, _, _ ->
+            if (text.isNullOrEmpty()) {
+                step1ViewModel.enableNextButton(false)
+            } else {
+                step1ViewModel.enableNextButton(true)
+            }
+            sharedViewModel.geoName = text.toString()
+            Log.d("onTextChanged", sharedViewModel.geoName)
+        }
+    }
+
+    private fun step1NextClicked() = with(binding) {
+        step1ViewModel.nextButtonEnabled.observe(viewLifecycleOwner) {
+            step1Next.isEnabled = it
+        }
+
+        step1Next.setOnClickListener {
+            if (step1Next.isEnabled) {
+                sharedViewModel.geoId = System.currentTimeMillis()
+                val action = Step1FragmentDirections.actionStep1FragmentToStep2Fragment()
+                findNavController().navigate(action)
+            }
+        }
+    }
 }

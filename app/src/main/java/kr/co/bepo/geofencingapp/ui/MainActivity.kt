@@ -20,10 +20,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        initNavigtaion()
+        initNavigation()
     }
 
-    private fun initNavigtaion() = with(binding) {
+    private fun initNavigation() = with(binding) {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.navHostFragment) as NavHostFragment
         navController = navHostFragment.navController
