@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.common.api.ApiException
 import com.google.android.libraries.places.api.Places
@@ -68,7 +67,12 @@ class Step1Fragment : Fragment() {
 
         getCountryCodeFromCurrentLocation()
         onTextChanged()
-        step1NextClicked()
+
+        step1ViewModel.nextButtonEnabled.observe(viewLifecycleOwner) {
+            step1Next.isEnabled = it
+            step1NextClicked(it)
+            setProgressVisibility(it)
+        }
     }
 
     private fun onStep1BackClicked() {
@@ -93,6 +97,7 @@ class Step1Fragment : Fragment() {
                         1
                     )
                     sharedViewModel.geoCountryCode = address[0].countryCode
+                    Log.e("Step1Fragment", sharedViewModel.geoCountryCode)
                 } else {
                     val exception = task.exception
                     if (exception is ApiException) {
@@ -124,17 +129,21 @@ class Step1Fragment : Fragment() {
         }
     }
 
-    private fun step1NextClicked() = with(binding) {
-        step1ViewModel.nextButtonEnabled.observe(viewLifecycleOwner) {
-            step1Next.isEnabled = it
-        }
-
+    private fun step1NextClicked(nextButtonEnabled: Boolean) = with(binding) {
         step1Next.setOnClickListener {
-            if (step1Next.isEnabled) {
+            if (nextButtonEnabled) {
                 sharedViewModel.geoId = System.currentTimeMillis()
                 val action = Step1FragmentDirections.actionStep1FragmentToStep2Fragment()
                 findNavController().navigate(action)
             }
+        }
+    }
+
+    private fun setProgressVisibility(nextButtonEnabled: Boolean) = with(binding) {
+        if (nextButtonEnabled) {
+            progressBar.visibility = View.GONE
+        } else {
+            progressBar.visibility = View.VISIBLE
         }
     }
 }
