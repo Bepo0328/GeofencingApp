@@ -11,4 +11,8 @@
     <string name="name">Name</string>
     <string name="next">Next</string>
     <string name="back">Back</string>
+
+    <!-- Fragment Step2 -->
+    <string name="two_three">2/3</string>
+    <string name="location">Location</string>
 </resources>
