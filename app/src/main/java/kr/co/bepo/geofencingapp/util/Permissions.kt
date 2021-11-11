@@ -16,7 +16,7 @@ object Permissions {
             Manifest.permission.ACCESS_FINE_LOCATION
         )
 
-    fun requestLocationPermission(fragment: Fragment){
+    fun requestLocationPermission(fragment: Fragment) {
         EasyPermissions.requestPermissions(
             fragment,
             "This application cannot work without Location Permission.",
@@ -35,7 +35,7 @@ object Permissions {
         return true
     }
 
-    fun requestBackgroundLocationPermission(fragment: Fragment){
+    fun requestBackgroundLocationPermission(fragment: Fragment) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             EasyPermissions.requestPermissions(
                 fragment,
