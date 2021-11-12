@@ -15,4 +15,8 @@
     <!-- Fragment Step2 -->
     <string name="two_three">2/3</string>
     <string name="location">Location</string>
+
+    <!-- Predictions Row Layout -->
+    <string name="city">City</string>
+    <string name="country">Country</string>
 </resources>
