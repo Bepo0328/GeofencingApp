@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.common.api.ApiException
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken
@@ -19,6 +20,7 @@ import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRe
 import com.google.android.libraries.places.api.net.PlacesClient
 import kotlinx.coroutines.launch
 import kr.co.bepo.geofencingapp.R
+import kr.co.bepo.geofencingapp.adapters.PredictionsAdapter
 import kr.co.bepo.geofencingapp.databinding.FragmentStep2Binding
 import kr.co.bepo.geofencingapp.viewmodels.SharedViewModel
 
@@ -26,6 +28,8 @@ class Step2Fragment : Fragment() {
 
     private var _binding: FragmentStep2Binding? = null
     private val binding get() = _binding!!
+
+    private val predictionsAdapter by lazy { PredictionsAdapter() }
 
     private val sharedViewModel: SharedViewModel by activityViewModels()
 
@@ -56,6 +60,9 @@ class Step2Fragment : Fragment() {
     }
 
     private fun initViews() = with(binding) {
+        predictionsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        predictionsRecyclerView.adapter = predictionsAdapter
+
         geofenceLocationEt.doOnTextChanged { text, _, _, _ ->
             getPlaces(text)
         }
@@ -73,7 +80,7 @@ class Step2Fragment : Fragment() {
         if (sharedViewModel.checkDeviceLocationSettings(requireContext())) {
             lifecycleScope.launch {
                 if (text.isNullOrEmpty()) {
-
+                    predictionsAdapter.setData(emptyList())
                 } else {
                     val token = AutocompleteSessionToken.newInstance()
                     val request = FindAutocompletePredictionsRequest.builder()
@@ -85,7 +92,7 @@ class Step2Fragment : Fragment() {
 
                     placeClient.findAutocompletePredictions(request)
                         .addOnSuccessListener { response ->
-
+                            predictionsAdapter.setData(response.autocompletePredictions)
                         }
                         .addOnFailureListener { exception: Exception? ->
                             if (exception is ApiException) {

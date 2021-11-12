@@ -24,6 +24,8 @@ class PredictionsAdapter : RecyclerView.Adapter<PredictionsAdapter.MyViewHolder>
             root.setOnClickListener {
                 setPlaceId(prediction.placeId)
             }
+            cityTextView.text = prediction.getPrimaryText(null).toString()
+            countryTextView.text = prediction.getSecondaryText(null).toString()
         }
     }
 
