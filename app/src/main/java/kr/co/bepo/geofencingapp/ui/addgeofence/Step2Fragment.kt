@@ -9,20 +9,26 @@ import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.common.api.ApiException
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken
+import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.model.TypeFilter
+import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import com.google.android.libraries.places.api.net.PlacesClient
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kr.co.bepo.geofencingapp.R
 import kr.co.bepo.geofencingapp.adapters.PredictionsAdapter
 import kr.co.bepo.geofencingapp.databinding.FragmentStep2Binding
+import kr.co.bepo.geofencingapp.util.ExtensionFunctions.hide
 import kr.co.bepo.geofencingapp.viewmodels.SharedViewModel
+import kr.co.bepo.geofencingapp.viewmodels.Step2ViewModel
 
 class Step2Fragment : Fragment() {
 
@@ -32,6 +38,7 @@ class Step2Fragment : Fragment() {
     private val predictionsAdapter by lazy { PredictionsAdapter() }
 
     private val sharedViewModel: SharedViewModel by activityViewModels()
+    private val step2ViewModel: Step2ViewModel by viewModels()
 
     private lateinit var placeClient: PlacesClient
 
@@ -64,6 +71,7 @@ class Step2Fragment : Fragment() {
         predictionsRecyclerView.adapter = predictionsAdapter
 
         geofenceLocationEt.doOnTextChanged { text, _, _, _ ->
+            handleNextButton(text)
             getPlaces(text)
         }
 
@@ -74,6 +82,46 @@ class Step2Fragment : Fragment() {
         step2Next.setOnClickListener {
             onStep2NextClicked()
         }
+
+        subscribeToObservers()
+    }
+
+    private fun handleNextButton(text: CharSequence?) {
+         if (text.isNullOrEmpty()) {
+             step2ViewModel.enableNextButton(false)
+         }
+    }
+
+    private fun subscribeToObservers() {
+        lifecycleScope.launch {
+            predictionsAdapter.placeId.collectLatest { placeId ->
+                if (placeId.isNotEmpty()) {
+                    onCitySelected(placeId)
+                }
+            }
+        }
+    }
+
+    private fun onCitySelected(placeId: String) {
+        val placeFields = listOf(
+            Place.Field.ID,
+            Place.Field.LAT_LNG,
+            Place.Field.NAME,
+        )
+        val request = FetchPlaceRequest.builder(placeId, placeFields).build()
+        placeClient.fetchPlace(request)
+            .addOnSuccessListener { response ->
+                sharedViewModel.geoLatLng = response.place.latLng!!
+                sharedViewModel.geoLocationName = response.place.name!!
+                sharedViewModel.geoCitySelected = true
+                binding.geofenceLocationEt.setText(sharedViewModel.geoLocationName)
+                binding.geofenceLocationEt.setSelection(sharedViewModel.geoLocationName.length)
+                binding.predictionsRecyclerView.hide()
+                step2ViewModel.enableNextButton(true)
+            }
+            .addOnFailureListener { exception ->
+                Log.e("Step2Fragment", exception.message.toString())
+            }
     }
 
     private fun getPlaces(text: CharSequence?) {
