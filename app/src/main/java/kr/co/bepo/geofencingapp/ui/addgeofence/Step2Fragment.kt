@@ -21,12 +21,14 @@ import com.google.android.libraries.places.api.model.TypeFilter
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import com.google.android.libraries.places.api.net.PlacesClient
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kr.co.bepo.geofencingapp.R
 import kr.co.bepo.geofencingapp.adapters.PredictionsAdapter
 import kr.co.bepo.geofencingapp.databinding.FragmentStep2Binding
 import kr.co.bepo.geofencingapp.util.ExtensionFunctions.hide
+import kr.co.bepo.geofencingapp.util.NetworkListener
 import kr.co.bepo.geofencingapp.viewmodels.SharedViewModel
 import kr.co.bepo.geofencingapp.viewmodels.Step2ViewModel
 
@@ -41,6 +43,8 @@ class Step2Fragment : Fragment() {
     private val step2ViewModel: Step2ViewModel by viewModels()
 
     private lateinit var placeClient: PlacesClient
+
+    private lateinit var networkListener: NetworkListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,6 +71,8 @@ class Step2Fragment : Fragment() {
     }
 
     private fun initViews() = with(binding) {
+        checkInternetConnection()
+
         predictionsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         predictionsRecyclerView.adapter = predictionsAdapter
 
@@ -156,12 +162,27 @@ class Step2Fragment : Fragment() {
     }
 
     private fun onStep2NextClicked() {
-        val action = Step2FragmentDirections.actionStep2FragmentToStep1Fragment()
+        val action = Step2FragmentDirections.actionStep2FragmentToStep3Fragment()
         findNavController().navigate(action)
     }
 
     private fun onStep2BackClicked() {
-        val action = Step2FragmentDirections.actionStep2FragmentToStep3Fragment()
+        val action = Step2FragmentDirections.actionStep2FragmentToStep1Fragment()
         findNavController().navigate(action)
+    }
+
+    private fun checkInternetConnection() {
+        lifecycleScope.launch {
+            networkListener = NetworkListener()
+            networkListener.checkNetworkAvailability(requireContext())
+                .collect { online ->
+                    step2ViewModel.setInternetAvailability(online)
+                    if (online && sharedViewModel.geoCitySelected) {
+                        step2ViewModel.enableNextButton(true)
+                    } else{
+                        step2ViewModel.enableNextButton(false)
+                    }
+                }
+        }
     }
 }
