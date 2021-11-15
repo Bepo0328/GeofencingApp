@@ -151,6 +151,7 @@ class Step2Fragment : Fragment() {
                     placeClient.findAutocompletePredictions(request)
                         .addOnSuccessListener { response ->
                             predictionsAdapter.setData(response.autocompletePredictions)
+                            binding.predictionsRecyclerView.scheduleLayoutAnimation()
                         }
                         .addOnFailureListener { exception: Exception? ->
                             if (exception is ApiException) {
