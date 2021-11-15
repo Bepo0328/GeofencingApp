@@ -13,6 +13,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.common.api.ApiException
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken
@@ -28,6 +29,7 @@ import kr.co.bepo.geofencingapp.R
 import kr.co.bepo.geofencingapp.adapters.PredictionsAdapter
 import kr.co.bepo.geofencingapp.databinding.FragmentStep2Binding
 import kr.co.bepo.geofencingapp.util.ExtensionFunctions.hide
+import kr.co.bepo.geofencingapp.util.ExtensionFunctions.show
 import kr.co.bepo.geofencingapp.util.NetworkListener
 import kr.co.bepo.geofencingapp.viewmodels.SharedViewModel
 import kr.co.bepo.geofencingapp.viewmodels.Step2ViewModel
@@ -82,20 +84,22 @@ class Step2Fragment : Fragment() {
         }
 
         step2Back.setOnClickListener {
-            onStep2BackClicked()
+            step2BackClicked()
         }
 
-        step2Next.setOnClickListener {
-            onStep2NextClicked()
+        step2ViewModel.nextButtonEnabled.observe(viewLifecycleOwner) {
+            step2Next.isEnabled = it
+            step2NextClicked(it)
         }
 
         subscribeToObservers()
+        handleNetworkConnection()
     }
 
     private fun handleNextButton(text: CharSequence?) {
-         if (text.isNullOrEmpty()) {
-             step2ViewModel.enableNextButton(false)
-         }
+        if (text.isNullOrEmpty()) {
+            step2ViewModel.enableNextButton(false)
+        }
     }
 
     private fun subscribeToObservers() {
@@ -161,14 +165,20 @@ class Step2Fragment : Fragment() {
         }
     }
 
-    private fun onStep2NextClicked() {
-        val action = Step2FragmentDirections.actionStep2FragmentToStep3Fragment()
-        findNavController().navigate(action)
-    }
-
-    private fun onStep2BackClicked() {
-        val action = Step2FragmentDirections.actionStep2FragmentToStep1Fragment()
-        findNavController().navigate(action)
+    private fun handleNetworkConnection() = with(binding) {
+        step2ViewModel.internetAvailable.observe(viewLifecycleOwner) { networkAvailable ->
+            Log.d("Step2Fragment", "networkAvailable: $networkAvailable")
+            if (!networkAvailable) {
+                geofenceLocationTextInputLayout.isErrorEnabled = true
+                geofenceLocationTextInputLayout.error = "No Internet Connection."
+                predictionsRecyclerView.hide()
+            } else {
+                geofenceLocationTextInputLayout.isErrorEnabled = false
+                geofenceLocationTextInputLayout.error = null
+                predictionsRecyclerView.show()
+            }
+            geofenceLocationEt.setText(sharedViewModel.geoLocationName)
+        }
     }
 
     private fun checkInternetConnection() {
@@ -179,10 +189,24 @@ class Step2Fragment : Fragment() {
                     step2ViewModel.setInternetAvailability(online)
                     if (online && sharedViewModel.geoCitySelected) {
                         step2ViewModel.enableNextButton(true)
-                    } else{
+                    } else {
                         step2ViewModel.enableNextButton(false)
                     }
                 }
         }
+    }
+
+    private fun step2NextClicked(nextButtonEnabled: Boolean) = with(binding) {
+        step2Next.setOnClickListener {
+            if (nextButtonEnabled) {
+                val action = Step2FragmentDirections.actionStep2FragmentToStep3Fragment()
+                findNavController().navigate(action)
+            }
+        }
+    }
+
+    private fun step2BackClicked() {
+        val action = Step2FragmentDirections.actionStep2FragmentToStep1Fragment()
+        findNavController().navigate(action)
     }
 }
