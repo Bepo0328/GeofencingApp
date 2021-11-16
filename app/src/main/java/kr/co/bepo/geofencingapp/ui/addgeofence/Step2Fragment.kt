@@ -96,6 +96,20 @@ class Step2Fragment : Fragment() {
         handleNetworkConnection()
     }
 
+    private fun step2NextClicked(nextButtonEnabled: Boolean) = with(binding) {
+        step2Next.setOnClickListener {
+            if (nextButtonEnabled) {
+                val action = Step2FragmentDirections.actionStep2FragmentToStep3Fragment()
+                findNavController().navigate(action)
+            }
+        }
+    }
+
+    private fun step2BackClicked() {
+        val action = Step2FragmentDirections.actionStep2FragmentToStep1Fragment()
+        findNavController().navigate(action)
+    }
+
     private fun handleNextButton(text: CharSequence?) {
         if (text.isNullOrEmpty()) {
             step2ViewModel.enableNextButton(false)
@@ -195,19 +209,5 @@ class Step2Fragment : Fragment() {
                     }
                 }
         }
-    }
-
-    private fun step2NextClicked(nextButtonEnabled: Boolean) = with(binding) {
-        step2Next.setOnClickListener {
-            if (nextButtonEnabled) {
-                val action = Step2FragmentDirections.actionStep2FragmentToStep3Fragment()
-                findNavController().navigate(action)
-            }
-        }
-    }
-
-    private fun step2BackClicked() {
-        val action = Step2FragmentDirections.actionStep2FragmentToStep1Fragment()
-        findNavController().navigate(action)
     }
 }

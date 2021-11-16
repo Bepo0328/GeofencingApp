@@ -28,8 +28,10 @@ class SharedViewModel @Inject constructor(
     var geoCountryCode = ""
     var geoLocationName = "Search a City"
     var geoLatLng = LatLng(0.0, 0.0)
+    var geoRadius = 500f
 
     var geoCitySelected = false
+    var geofenceReady = false
 
     // DataStore
     val readFirstLaunch = dataStoreRepository.readFirstLaunch.asLiveData()

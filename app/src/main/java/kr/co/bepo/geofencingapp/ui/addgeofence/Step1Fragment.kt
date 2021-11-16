@@ -80,6 +80,16 @@ class Step1Fragment : Fragment() {
         findNavController().navigate(action)
     }
 
+    private fun step1NextClicked(nextButtonEnabled: Boolean) = with(binding) {
+        step1Next.setOnClickListener {
+            if (nextButtonEnabled) {
+                sharedViewModel.geoId = System.currentTimeMillis()
+                val action = Step1FragmentDirections.actionStep1FragmentToStep2Fragment()
+                findNavController().navigate(action)
+            }
+        }
+    }
+
     @SuppressLint("MissingPermission")
     private fun getCountryCodeFromCurrentLocation() {
         lifecycleScope.launch {
@@ -126,16 +136,6 @@ class Step1Fragment : Fragment() {
             }
             sharedViewModel.geoName = text.toString()
             Log.d("onTextChanged", sharedViewModel.geoName)
-        }
-    }
-
-    private fun step1NextClicked(nextButtonEnabled: Boolean) = with(binding) {
-        step1Next.setOnClickListener {
-            if (nextButtonEnabled) {
-                sharedViewModel.geoId = System.currentTimeMillis()
-                val action = Step1FragmentDirections.actionStep1FragmentToStep2Fragment()
-                findNavController().navigate(action)
-            }
         }
     }
 
