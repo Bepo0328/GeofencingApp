@@ -15,6 +15,7 @@
     <!-- Fragment Step2 -->
     <string name="two_three">2/3</string>
     <string name="location">Location</string>
+    <string name="powered_by_google">Powered By Google</string>
 
     <!-- Predictions Row Layout -->
     <string name="city">City</string>
