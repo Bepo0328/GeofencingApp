@@ -45,7 +45,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun initViews() = with(binding) {
-        floatingActionButton.setOnClickListener {
+        addGeofenceFab.setOnClickListener {
             val action = MapsFragmentDirections.actionMapsFragmentToAddGeofenceGraph()
             findNavController().navigate(action)
         }
