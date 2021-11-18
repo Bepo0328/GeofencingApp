@@ -13,12 +13,15 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kr.co.bepo.geofencingapp.data.DataStoreRepository
+import kr.co.bepo.geofencingapp.data.GeofenceEntity
+import kr.co.bepo.geofencingapp.data.GeofenceRepository
 import javax.inject.Inject
 
 @HiltViewModel
 class SharedViewModel @Inject constructor(
     application: Application,
-    private val dataStoreRepository: DataStoreRepository
+    private val dataStoreRepository: DataStoreRepository,
+    private val geofenceRepository: GeofenceRepository
 ) : AndroidViewModel(application) {
 
     val app = application
@@ -39,6 +42,19 @@ class SharedViewModel @Inject constructor(
     fun saveFirstLaunch(firstLaunch: Boolean) =
         viewModelScope.launch(Dispatchers.IO) {
             dataStoreRepository.saveFirstLaunch(firstLaunch)
+        }
+
+    // Database
+    val readGeofences = geofenceRepository.readGeofences.asLiveData()
+
+    fun addGeofence(geofenceEntity: GeofenceEntity) =
+        viewModelScope.launch(Dispatchers.IO) {
+            geofenceRepository.addGeofence(geofenceEntity)
+        }
+
+    fun removeGeofence(geofenceEntity: GeofenceEntity) =
+        viewModelScope.launch(Dispatchers.IO) {
+            geofenceRepository.removeGeofence(geofenceEntity)
         }
 
     fun checkDeviceLocationSettings(context: Context): Boolean {
