@@ -1,6 +1,7 @@
 package kr.co.bepo.geofencingapp.ui.maps
 
 import android.annotation.SuppressLint
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -29,7 +30,7 @@ import kr.co.bepo.geofencingapp.util.Permissions.requestBackgroundLocationPermis
 import kr.co.bepo.geofencingapp.viewmodels.SharedViewModel
 
 class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapLongClickListener,
-    EasyPermissions.PermissionCallbacks {
+    EasyPermissions.PermissionCallbacks, GoogleMap.SnapshotReadyCallback {
 
     private var _binding: FragmentMapsBinding? = null
     private val binding get() = _binding!!
@@ -132,6 +133,9 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapLongClickLis
                 drawCircle(location)
                 drawMarker(location)
                 zoomToGeofence(circle.center, circle.radius.toFloat())
+
+                delay(1500)
+                map.snapshot(this@MapsFragment)
             } else {
                 Toast.makeText(
                     requireContext(),
@@ -163,6 +167,10 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapLongClickLis
                 sharedViewModel.getBounds(center, radius), 10
             ), 1000, null
         )
+    }
+
+    override fun onSnapshotReady(snapshot: Bitmap?) {
+        sharedViewModel.geoSnapshot = snapshot
     }
 
     override fun onRequestPermissionsResult(

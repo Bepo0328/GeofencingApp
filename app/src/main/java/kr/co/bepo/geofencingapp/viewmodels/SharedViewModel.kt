@@ -2,6 +2,7 @@ package kr.co.bepo.geofencingapp.viewmodels
 
 import android.app.Application
 import android.content.Context
+import android.graphics.Bitmap
 import android.location.LocationManager
 import android.os.Build
 import android.provider.Settings
@@ -29,16 +30,17 @@ class SharedViewModel @Inject constructor(
 
     val app = application
 
-    var geoId = 0L
-    var geoName = "Default"
-    var geoCountryCode = ""
-    var geoLocationName = "Search a City"
-    var geoLatLng = LatLng(0.0, 0.0)
-    var geoRadius = 500f
+    var geoId: Long = 0L
+    var geoName: String = "Default"
+    var geoCountryCode: String = ""
+    var geoLocationName: String = "Search a City"
+    var geoLatLng: LatLng = LatLng(0.0, 0.0)
+    var geoRadius: Float = 500f
+    var geoSnapshot: Bitmap? = null
 
-    var geoCitySelected = false
-    var geofenceReady = false
-    var geofencePrepared = false
+    var geoCitySelected: Boolean = false
+    var geofenceReady: Boolean = false
+    var geofencePrepared: Boolean = false
 
     // DataStore
     val readFirstLaunch = dataStoreRepository.readFirstLaunch.asLiveData()
@@ -63,7 +65,8 @@ class SharedViewModel @Inject constructor(
 
     fun getBounds(center: LatLng, radius: Float): LatLngBounds {
         val distancesFromCenterToCorner = radius * sqrt(2.0)
-        val southwestCorner = SphericalUtil.computeOffset(center, distancesFromCenterToCorner, 225.0)
+        val southwestCorner =
+            SphericalUtil.computeOffset(center, distancesFromCenterToCorner, 225.0)
         val northEastCorner = SphericalUtil.computeOffset(center, distancesFromCenterToCorner, 45.0)
         return LatLngBounds(southwestCorner, northEastCorner)
     }
