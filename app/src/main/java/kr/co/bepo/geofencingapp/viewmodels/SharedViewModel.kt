@@ -9,6 +9,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.maps.android.SphericalUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -16,6 +18,7 @@ import kr.co.bepo.geofencingapp.data.DataStoreRepository
 import kr.co.bepo.geofencingapp.data.GeofenceEntity
 import kr.co.bepo.geofencingapp.data.GeofenceRepository
 import javax.inject.Inject
+import kotlin.math.sqrt
 
 @HiltViewModel
 class SharedViewModel @Inject constructor(
@@ -57,6 +60,13 @@ class SharedViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             geofenceRepository.removeGeofence(geofenceEntity)
         }
+
+    fun getBounds(center: LatLng, radius: Float): LatLngBounds {
+        val distancesFromCenterToCorner = radius * sqrt(2.0)
+        val southwestCorner = SphericalUtil.computeOffset(center, distancesFromCenterToCorner, 225.0)
+        val northEastCorner = SphericalUtil.computeOffset(center, distancesFromCenterToCorner, 45.0)
+        return LatLngBounds(southwestCorner, northEastCorner)
+    }
 
     fun checkDeviceLocationSettings(context: Context): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {

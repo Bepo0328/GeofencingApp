@@ -37,6 +37,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapLongClickLis
     private val sharedViewModel: SharedViewModel by activityViewModels()
 
     private lateinit var map: GoogleMap
+    private lateinit var circle: Circle
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -130,6 +131,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapLongClickLis
             if (sharedViewModel.checkDeviceLocationSettings(requireContext())) {
                 drawCircle(location)
                 drawMarker(location)
+                zoomToGeofence(circle.center, circle.radius.toFloat())
             } else {
                 Toast.makeText(
                     requireContext(),
@@ -141,7 +143,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapLongClickLis
     }
 
     private fun drawCircle(location: LatLng) {
-        map.addCircle(
+        circle = map.addCircle(
             CircleOptions().center(location).radius(sharedViewModel.geoRadius.toDouble())
                 .strokeColor(ContextCompat.getColor(requireContext(), R.color.blue_700))
                 .fillColor(ContextCompat.getColor(requireContext(), R.color.blue_transparent))
@@ -152,6 +154,14 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapLongClickLis
         map.addMarker(
             MarkerOptions().position(location).title(sharedViewModel.geoName)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+        )
+    }
+
+    private fun zoomToGeofence(center: LatLng, radius: Float) {
+        map.animateCamera(
+            CameraUpdateFactory.newLatLngBounds(
+                sharedViewModel.getBounds(center, radius), 10
+            ), 1000, null
         )
     }
 
