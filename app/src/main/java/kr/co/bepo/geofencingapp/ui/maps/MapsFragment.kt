@@ -84,6 +84,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapLongClickLis
             isMapToolbarEnabled = false
         }
         onGeofenceReady()
+        observeDatabase()
     }
 
     private fun onGeofenceReady() {
@@ -111,6 +112,16 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapLongClickLis
         )
     }
 
+    private fun observeDatabase() {
+        sharedViewModel.readGeofences.observe(viewLifecycleOwner) { geofenceEntity ->
+            map.clear()
+            geofenceEntity.forEach { geofence ->
+                drawCircle(LatLng(geofence.latitude, geofence.longitude), geofence.radius)
+                drawMarker(LatLng(geofence.latitude, geofence.longitude), geofence.name)
+            }
+        }
+    }
+
     override fun onMapLongClick(location: LatLng) {
         if (hasBackgroundLocationPermission(requireContext())) {
             if (sharedViewModel.geofencePrepared) {
@@ -130,8 +141,8 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapLongClickLis
     private fun setupGeofence(location: LatLng) {
         lifecycleScope.launch {
             if (sharedViewModel.checkDeviceLocationSettings(requireContext())) {
-                drawCircle(location)
-                drawMarker(location)
+                drawCircle(location, sharedViewModel.geoRadius)
+                drawMarker(location, sharedViewModel.geoName)
                 zoomToGeofence(circle.center, circle.radius.toFloat())
 
                 delay(1_500L)
@@ -148,17 +159,17 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapLongClickLis
         }
     }
 
-    private fun drawCircle(location: LatLng) {
+    private fun drawCircle(location: LatLng, radius: Float) {
         circle = map.addCircle(
-            CircleOptions().center(location).radius(sharedViewModel.geoRadius.toDouble())
+            CircleOptions().center(location).radius(radius.toDouble())
                 .strokeColor(ContextCompat.getColor(requireContext(), R.color.blue_700))
                 .fillColor(ContextCompat.getColor(requireContext(), R.color.blue_transparent))
         )
     }
 
-    private fun drawMarker(location: LatLng) {
+    private fun drawMarker(location: LatLng, name: String) {
         map.addMarker(
-            MarkerOptions().position(location).title(sharedViewModel.geoName)
+            MarkerOptions().position(location).title(name)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
         )
     }
