@@ -98,9 +98,9 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapLongClickLis
     private fun displayInfoMessage() = with(binding) {
         lifecycleScope.launch {
             infoMessageTextView.show()
-            delay(2000)
+            delay(2_000L)
             infoMessageTextView.animate().alpha(0f).duration = 800
-            delay(1000)
+            delay(1_000L)
             infoMessageTextView.hide()
         }
     }
@@ -134,8 +134,10 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapLongClickLis
                 drawMarker(location)
                 zoomToGeofence(circle.center, circle.radius.toFloat())
 
-                delay(1500)
+                delay(1_500L)
                 map.snapshot(this@MapsFragment)
+                delay(2_000L)
+                sharedViewModel.addGeofenceToDatabase(location)
             } else {
                 Toast.makeText(
                     requireContext(),

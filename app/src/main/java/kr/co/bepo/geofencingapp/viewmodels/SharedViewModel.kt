@@ -63,6 +63,20 @@ class SharedViewModel @Inject constructor(
             geofenceRepository.removeGeofence(geofenceEntity)
         }
 
+    fun addGeofenceToDatabase(location: LatLng) {
+        val geofenceEntity =
+            GeofenceEntity(
+                geoId = geoId,
+                name = geoName,
+                location = geoLocationName,
+                latitude = location.latitude,
+                longitude = location.longitude,
+                radius = geoRadius,
+                snapshot =geoSnapshot!!
+            )
+        addGeofence(geofenceEntity)
+    }
+
     fun getBounds(center: LatLng, radius: Float): LatLngBounds {
         val distancesFromCenterToCorner = radius * sqrt(2.0)
         val southwestCorner =
