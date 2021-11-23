@@ -149,6 +149,8 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapLongClickLis
                 map.snapshot(this@MapsFragment)
                 delay(2_000L)
                 sharedViewModel.addGeofenceToDatabase(location)
+                delay(2_000L)
+                sharedViewModel.startGeofence(location.latitude, location.longitude)
             } else {
                 Toast.makeText(
                     requireContext(),

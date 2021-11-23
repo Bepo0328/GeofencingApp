@@ -5,7 +5,6 @@ import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.android.gms.location.Geofence
@@ -16,7 +15,7 @@ import kr.co.bepo.geofencingapp.util.Constants.NOTIFICATION_CHANNEL_ID
 import kr.co.bepo.geofencingapp.util.Constants.NOTIFICATION_CHANNEL_NAME
 import kr.co.bepo.geofencingapp.util.Constants.NOTIFICATION_ID
 
-class GeofenceBroadcastReceiver: BroadcastReceiver() {
+class GeofenceBroadcastReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val geofencingEvent = GeofencingEvent.fromIntent(intent)
