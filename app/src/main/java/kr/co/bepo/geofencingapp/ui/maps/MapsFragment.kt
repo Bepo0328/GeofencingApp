@@ -23,6 +23,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kr.co.bepo.geofencingapp.R
 import kr.co.bepo.geofencingapp.databinding.FragmentMapsBinding
+import kr.co.bepo.geofencingapp.util.ExtensionFunctions.disable
+import kr.co.bepo.geofencingapp.util.ExtensionFunctions.enable
 import kr.co.bepo.geofencingapp.util.ExtensionFunctions.hide
 import kr.co.bepo.geofencingapp.util.ExtensionFunctions.show
 import kr.co.bepo.geofencingapp.util.Permissions.hasBackgroundLocationPermission
@@ -141,6 +143,10 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapLongClickLis
     private fun setupGeofence(location: LatLng) {
         lifecycleScope.launch {
             if (sharedViewModel.checkDeviceLocationSettings(requireContext())) {
+                binding.geofencesFab.disable()
+                binding.addGeofenceFab.disable()
+                binding.geofenceProgressBar.show()
+
                 drawCircle(location, sharedViewModel.geoRadius)
                 drawMarker(location, sharedViewModel.geoName)
                 zoomToGeofence(circle.center, circle.radius.toFloat())
@@ -151,6 +157,11 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapLongClickLis
                 sharedViewModel.addGeofenceToDatabase(location)
                 delay(2_000L)
                 sharedViewModel.startGeofence(location.latitude, location.longitude)
+                sharedViewModel.resetSharedValues()
+
+                binding.geofencesFab.enable()
+                binding.addGeofenceFab.enable()
+                binding.geofenceProgressBar.hide()
             } else {
                 Toast.makeText(
                     requireContext(),

@@ -52,6 +52,20 @@ class SharedViewModel @Inject constructor(
     var geofenceReady: Boolean = false
     var geofencePrepared: Boolean = false
 
+    fun resetSharedValues() {
+        geoId = 0L
+        geoName = "Default"
+        geoCountryCode = ""
+        geoLocationName = "Search a City"
+        geoLatLng = LatLng(0.0, 0.0)
+        geoRadius = 500f
+        geoSnapshot = null
+
+        geoCitySelected = false
+        geofenceReady = false
+        geofencePrepared = false
+    }
+
     // DataStore
     val readFirstLaunch = dataStoreRepository.readFirstLaunch.asLiveData()
 
