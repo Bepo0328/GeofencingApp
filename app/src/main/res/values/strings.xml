@@ -29,5 +29,6 @@
     <string name="display_meters">%1$s m</string>
     <string name="display_kilometers">%1$s km</string>
     <string name="long_press_on_the_map_n_to_add_a_geofence">Long Press on the Map \n to Add a Geofence.</string>
+    <string name="no_geofence_found">No Geofence Found.</string>
 
 </resources>
