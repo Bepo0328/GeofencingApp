@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import kr.co.bepo.geofencingapp.R
 import kr.co.bepo.geofencingapp.adapters.GeofencesAdapter
 import kr.co.bepo.geofencingapp.databinding.FragmentGeofencesBinding
 import kr.co.bepo.geofencingapp.viewmodels.SharedViewModel
@@ -38,11 +37,21 @@ class GeofencesFragment : Fragment() {
         initViews()
     }
 
-    private fun initViews() = with(binding) {
+    private fun initViews() {
+        setupToolbar()
+        setupRecyclerView()
+        observeDatabase()
+    }
+
+    private fun setupToolbar() = with(binding) {
+        toolbar.setNavigationOnClickListener {
+            requireActivity().onBackPressed()
+        }
+    }
+
+    private fun setupRecyclerView() = with(binding) {
         geofencesRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         geofencesRecyclerView.adapter = geofencesAdapter
-
-        observeDatabase()
     }
 
     private fun observeDatabase() {

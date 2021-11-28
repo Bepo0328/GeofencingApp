@@ -2,18 +2,24 @@ package kr.co.bepo.geofencingapp.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import kr.co.bepo.geofencingapp.R
 import kr.co.bepo.geofencingapp.data.GeofenceEntity
 import kr.co.bepo.geofencingapp.databinding.GeofencesRowLayoutBinding
+import kr.co.bepo.geofencingapp.util.ExtensionFunctions.disable
+import kr.co.bepo.geofencingapp.util.ExtensionFunctions.enable
 import kr.co.bepo.geofencingapp.util.MyDiffUtil
 
-class GeofencesAdapter: RecyclerView.Adapter<GeofencesAdapter.MyViewHolder>() {
+class GeofencesAdapter : RecyclerView.Adapter<GeofencesAdapter.MyViewHolder>() {
 
     private var geofencesEntity = mutableListOf<GeofenceEntity>()
 
-    inner class MyViewHolder(private val binding: GeofencesRowLayoutBinding): RecyclerView.ViewHolder(binding.root) {
+    inner class MyViewHolder(private val binding: GeofencesRowLayoutBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
         fun bind(geofenceEntity: GeofenceEntity) = with(binding) {
             snapshotImageView.load(geofenceEntity.snapshot)
@@ -22,16 +28,64 @@ class GeofencesAdapter: RecyclerView.Adapter<GeofencesAdapter.MyViewHolder>() {
             latitudeTextView.text = parseCoordinates(geofenceEntity.latitude)
             longitudeTextView.text = parseCoordinates(geofenceEntity.longitude)
             radiusValueTextView.text = geofenceEntity.radius.toString()
+
+            deleteImageView.setOnClickListener {
+                Toast.makeText(root.context, "Clicked", Toast.LENGTH_SHORT).show()
+            }
+
+            handleMotionTransition()
         }
 
         private fun parseCoordinates(value: Double): String {
-            return  String.format("%.4f", value)
+            return String.format("%.4f", value)
+        }
+
+        private fun handleMotionTransition() = with(binding) {
+            deleteImageView.disable()
+            geofencesRowMotionLayout.setTransitionListener(object : MotionLayout.TransitionListener {
+                override fun onTransitionStarted(
+                    motionLayout: MotionLayout?,
+                    startId: Int,
+                    endId: Int
+                ) {
+                }
+
+                override fun onTransitionChange(
+                    motionLayout: MotionLayout?,
+                    startId: Int,
+                    endId: Int,
+                    progress: Float
+                ) {
+                }
+
+                override fun onTransitionTrigger(
+                    motionLayout: MotionLayout?,
+                    triggerId: Int,
+                    positive: Boolean,
+                    progress: Float
+                ) {
+                }
+
+                override fun onTransitionCompleted(motionLayout: MotionLayout?, currentId: Int) {
+                    if (motionLayout != null && currentId == R.id.start) {
+                        deleteImageView.disable()
+                    } else if (motionLayout != null && currentId == R.id.end) {
+                        deleteImageView.enable()
+                    }
+                }
+            })
         }
 
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder =
-        MyViewHolder(GeofencesRowLayoutBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+        MyViewHolder(
+            GeofencesRowLayoutBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
+        )
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         holder.bind(geofencesEntity[position])
