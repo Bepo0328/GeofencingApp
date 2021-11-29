@@ -20,6 +20,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.SphericalUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kr.co.bepo.geofencingapp.broadcastreceiver.GeofenceBroadcastReceiver
@@ -51,6 +52,7 @@ class SharedViewModel @Inject constructor(
     var geoCitySelected: Boolean = false
     var geofenceReady: Boolean = false
     var geofencePrepared: Boolean = false
+    var geofenceRemove: Boolean = false
 
     fun resetSharedValues() {
         geoId = 0L
@@ -64,6 +66,7 @@ class SharedViewModel @Inject constructor(
         geoCitySelected = false
         geofenceReady = false
         geofencePrepared = false
+        geofenceRemove = false
     }
 
     // DataStore
@@ -146,6 +149,23 @@ class SharedViewModel @Inject constructor(
             }
         } else {
             Log.d("Geofence", "Permission not granted.")
+        }
+    }
+
+    suspend fun stopGeofence(geoIds: List<Long>): Boolean {
+        return if (Permissions.hasBackgroundLocationPermission(app)) {
+            val result = CompletableDeferred<Boolean>()
+            geofencingClient.removeGeofences(setPendingIntent(geoIds.first().toInt()))
+                .addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        result.complete(true)
+                    } else {
+                        result.complete(false)
+                    }
+                }
+            result.await()
+        } else {
+            false
         }
     }
 

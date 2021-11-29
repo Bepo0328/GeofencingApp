@@ -1,20 +1,27 @@
 package kr.co.bepo.geofencingapp.adapters
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.constraintlayout.motion.widget.MotionLayout
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.launch
 import kr.co.bepo.geofencingapp.R
 import kr.co.bepo.geofencingapp.data.GeofenceEntity
 import kr.co.bepo.geofencingapp.databinding.GeofencesRowLayoutBinding
 import kr.co.bepo.geofencingapp.util.ExtensionFunctions.disable
 import kr.co.bepo.geofencingapp.util.ExtensionFunctions.enable
 import kr.co.bepo.geofencingapp.util.MyDiffUtil
+import kr.co.bepo.geofencingapp.viewmodels.SharedViewModel
 
-class GeofencesAdapter : RecyclerView.Adapter<GeofencesAdapter.MyViewHolder>() {
+class GeofencesAdapter(
+    private val sharedViewModel: SharedViewModel
+) : RecyclerView.Adapter<GeofencesAdapter.MyViewHolder>() {
 
     private var geofencesEntity = mutableListOf<GeofenceEntity>()
 
@@ -30,10 +37,45 @@ class GeofencesAdapter : RecyclerView.Adapter<GeofencesAdapter.MyViewHolder>() {
             radiusValueTextView.text = geofenceEntity.radius.toString()
 
             deleteImageView.setOnClickListener {
-                Toast.makeText(root.context, "Clicked", Toast.LENGTH_SHORT).show()
+                removeItem(geofenceEntity)
             }
 
             handleMotionTransition()
+        }
+
+        private fun removeItem(geofenceEntity: GeofenceEntity) {
+            sharedViewModel.viewModelScope.launch {
+                val geofenceStopped =
+                    sharedViewModel.stopGeofence(listOf(geofenceEntity.geoId))
+                if (geofenceStopped) {
+                    sharedViewModel.removeGeofence(geofenceEntity)
+                    sharedViewModel.geofenceRemove = true
+                    showSnackBar(geofenceEntity)
+                } else {
+                    Log.d("GeofencesAdapter", "Geofence NOT REMOVED!")
+                }
+            }
+        }
+
+        private fun showSnackBar(
+            removeItem: GeofenceEntity
+        ) {
+            Snackbar.make(
+                binding.root,
+                "Removed " + removeItem.name,
+                Snackbar.LENGTH_SHORT
+            ).setAction("UNDO") {
+                undoRemoval(removeItem)
+            }.show()
+        }
+
+        private fun undoRemoval(removeItem: GeofenceEntity) {
+            sharedViewModel.addGeofence(removeItem)
+            sharedViewModel.startGeofence(
+                removeItem.latitude,
+                removeItem.longitude
+            )
+            sharedViewModel.geofenceRemove = false
         }
 
         private fun parseCoordinates(value: Double): String {

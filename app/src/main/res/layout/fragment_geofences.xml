@@ -37,7 +37,6 @@
         android:layout_height="120dp"
         android:alpha="0.5"
         android:src="@drawable/ic_hourglass"
-        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -54,7 +53,6 @@
         android:text="@string/no_geofence_found"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="@+id/empty_imageView"
         app:layout_constraintStart_toStartOf="@+id/empty_imageView"
         app:layout_constraintTop_toBottomOf="@+id/empty_imageView" />

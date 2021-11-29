@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import kr.co.bepo.geofencingapp.adapters.GeofencesAdapter
+import kr.co.bepo.geofencingapp.data.GeofenceEntity
 import kr.co.bepo.geofencingapp.databinding.FragmentGeofencesBinding
 import kr.co.bepo.geofencingapp.viewmodels.SharedViewModel
 
@@ -17,7 +18,7 @@ class GeofencesFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val sharedViewModel: SharedViewModel by activityViewModels()
-    private val geofencesAdapter by lazy { GeofencesAdapter() }
+    private val geofencesAdapter by lazy { GeofencesAdapter(sharedViewModel) }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,6 +42,9 @@ class GeofencesFragment : Fragment() {
         setupToolbar()
         setupRecyclerView()
         observeDatabase()
+        sharedViewModel.readGeofences.observe(viewLifecycleOwner) {
+            setVisibility(it)
+        }
     }
 
     private fun setupToolbar() = with(binding) {
@@ -57,6 +61,16 @@ class GeofencesFragment : Fragment() {
     private fun observeDatabase() {
         sharedViewModel.readGeofences.observe(viewLifecycleOwner) {
             geofencesAdapter.setData(it)
+        }
+    }
+
+    private fun setVisibility(data: List<GeofenceEntity>) = with(binding) {
+        if (data.isNullOrEmpty()) {
+            emptyImageView.visibility = View.VISIBLE
+            emptyTextView.visibility = View.VISIBLE
+        } else {
+            emptyImageView.visibility = View.INVISIBLE
+            emptyTextView.visibility = View.INVISIBLE
         }
     }
 }
