@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -36,6 +37,8 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapLongClickLis
 
     private var _binding: FragmentMapsBinding? = null
     private val binding get() = _binding!!
+
+    private val args by navArgs<MapsFragmentArgs>()
 
     private val sharedViewModel: SharedViewModel by activityViewModels()
 
@@ -87,6 +90,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapLongClickLis
         }
         onGeofenceReady()
         observeDatabase()
+        backFromGeofencesFragment()
     }
 
     private fun onGeofenceReady() {
@@ -121,6 +125,16 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapLongClickLis
                 drawCircle(LatLng(geofence.latitude, geofence.longitude), geofence.radius)
                 drawMarker(LatLng(geofence.latitude, geofence.longitude), geofence.name)
             }
+        }
+    }
+
+    private fun backFromGeofencesFragment() {
+        if (args.geofenceEntity != null) {
+            val selectedGeofence = LatLng(
+                args.geofenceEntity!!.latitude,
+                args.geofenceEntity!!.longitude
+            )
+            zoomToGeofence(selectedGeofence, args.geofenceEntity!!.radius)
         }
     }
 

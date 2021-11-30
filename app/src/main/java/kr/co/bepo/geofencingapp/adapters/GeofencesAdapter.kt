@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
@@ -14,6 +15,7 @@ import kotlinx.coroutines.launch
 import kr.co.bepo.geofencingapp.R
 import kr.co.bepo.geofencingapp.data.GeofenceEntity
 import kr.co.bepo.geofencingapp.databinding.GeofencesRowLayoutBinding
+import kr.co.bepo.geofencingapp.ui.geofences.GeofencesFragmentDirections
 import kr.co.bepo.geofencingapp.util.ExtensionFunctions.disable
 import kr.co.bepo.geofencingapp.util.ExtensionFunctions.enable
 import kr.co.bepo.geofencingapp.util.MyDiffUtil
@@ -41,6 +43,12 @@ class GeofencesAdapter(
             }
 
             handleMotionTransition()
+
+            snapshotImageView.setOnClickListener {
+                val action =
+                    GeofencesFragmentDirections.actionGeofencesFragmentToMapsFragment(geofenceEntity)
+                binding.root.findNavController().navigate(action)
+            }
         }
 
         private fun removeItem(geofenceEntity: GeofenceEntity) {
@@ -49,7 +57,6 @@ class GeofencesAdapter(
                     sharedViewModel.stopGeofence(listOf(geofenceEntity.geoId))
                 if (geofenceStopped) {
                     sharedViewModel.removeGeofence(geofenceEntity)
-                    sharedViewModel.geofenceRemove = true
                     showSnackBar(geofenceEntity)
                 } else {
                     Log.d("GeofencesAdapter", "Geofence NOT REMOVED!")
@@ -75,7 +82,6 @@ class GeofencesAdapter(
                 removeItem.latitude,
                 removeItem.longitude
             )
-            sharedViewModel.geofenceRemove = false
         }
 
         private fun parseCoordinates(value: Double): String {

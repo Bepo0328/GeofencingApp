@@ -52,7 +52,6 @@ class SharedViewModel @Inject constructor(
     var geoCitySelected: Boolean = false
     var geofenceReady: Boolean = false
     var geofencePrepared: Boolean = false
-    var geofenceRemove: Boolean = false
 
     fun resetSharedValues() {
         geoId = 0L
@@ -66,7 +65,6 @@ class SharedViewModel @Inject constructor(
         geoCitySelected = false
         geofenceReady = false
         geofencePrepared = false
-        geofenceRemove = false
     }
 
     // DataStore
