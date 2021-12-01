@@ -41,10 +41,7 @@ class GeofencesFragment : Fragment() {
     private fun initViews() {
         setupToolbar()
         setupRecyclerView()
-        observeDatabase()
-        sharedViewModel.readGeofences.observe(viewLifecycleOwner) {
-            setVisibility(it)
-        }
+        observeData()
     }
 
     private fun setupToolbar() = with(binding) {
@@ -58,9 +55,11 @@ class GeofencesFragment : Fragment() {
         geofencesRecyclerView.adapter = geofencesAdapter
     }
 
-    private fun observeDatabase() {
+    private fun observeData() {
         sharedViewModel.readGeofences.observe(viewLifecycleOwner) {
             geofencesAdapter.setData(it)
+            binding.geofencesRecyclerView.scheduleLayoutAnimation()
+            setVisibility(it)
         }
     }
 
