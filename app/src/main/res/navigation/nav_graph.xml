@@ -29,10 +29,18 @@
         tools:layout="@layout/fragment_maps">
         <action
             android:id="@+id/action_mapsFragment_to_geofencesFragment"
-            app:destination="@id/geofencesFragment" />
+            app:destination="@id/geofencesFragment"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right" />
         <action
             android:id="@+id/action_mapsFragment_to_add_geofence_graph"
-            app:destination="@id/add_geofence_graph" />
+            app:destination="@id/add_geofence_graph"
+            app:enterAnim="@anim/from_bottom"
+            app:exitAnim="@anim/to_top"
+            app:popEnterAnim="@anim/from_top"
+            app:popExitAnim="@anim/to_bottom" />
         <argument
             android:name="geofenceEntity"
             app:argType="kr.co.bepo.geofencingapp.data.GeofenceEntity"
@@ -52,6 +60,10 @@
             <action
                 android:id="@+id/action_step1Fragment_to_step2Fragment"
                 app:destination="@id/step2Fragment"
+                app:enterAnim="@anim/from_right"
+                app:exitAnim="@anim/to_left"
+                app:popEnterAnim="@anim/from_left"
+                app:popExitAnim="@anim/to_right"
                 app:popUpTo="@id/step1Fragment" />
         </fragment>
 
@@ -63,10 +75,16 @@
             <action
                 android:id="@+id/action_step2Fragment_to_step3Fragment"
                 app:destination="@id/step3Fragment"
+                app:enterAnim="@anim/from_right"
+                app:exitAnim="@anim/to_left"
+                app:popEnterAnim="@anim/from_left"
+                app:popExitAnim="@anim/to_right"
                 app:popUpTo="@id/step2Fragment" />
             <action
                 android:id="@+id/action_step2Fragment_to_step1Fragment"
                 app:destination="@id/step1Fragment"
+                app:enterAnim="@anim/from_left"
+                app:exitAnim="@anim/to_right"
                 app:popUpTo="@id/step2Fragment" />
         </fragment>
 
@@ -78,6 +96,8 @@
             <action
                 android:id="@+id/action_step3Fragment_to_step2Fragment"
                 app:destination="@id/step2Fragment"
+                app:enterAnim="@anim/from_left"
+                app:exitAnim="@anim/to_right"
                 app:popUpTo="@id/step3Fragment" />
         </fragment>
 

@@ -3,7 +3,6 @@ package kr.co.bepo.geofencingapp.adapters
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.findNavController
@@ -90,7 +89,8 @@ class GeofencesAdapter(
 
         private fun handleMotionTransition() = with(binding) {
             deleteImageView.disable()
-            geofencesRowMotionLayout.setTransitionListener(object : MotionLayout.TransitionListener {
+            geofencesRowMotionLayout.setTransitionListener(object :
+                MotionLayout.TransitionListener {
                 override fun onTransitionStarted(
                     motionLayout: MotionLayout?,
                     startId: Int,
