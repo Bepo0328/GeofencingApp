@@ -23,6 +23,7 @@ import kr.co.bepo.geofencingapp.R
 import kr.co.bepo.geofencingapp.databinding.FragmentStep1Binding
 import kr.co.bepo.geofencingapp.viewmodels.SharedViewModel
 import kr.co.bepo.geofencingapp.viewmodels.Step1ViewModel
+import java.io.IOException
 
 class Step1Fragment : Fragment() {
 
@@ -99,15 +100,19 @@ class Step1Fragment : Fragment() {
             val placeResponse = placesClient.findCurrentPlace(request)
             placeResponse.addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    val response = task.result
-                    val latLng = response.placeLikelihoods[0].place.latLng!!
-                    val address = geoCoder.getFromLocation(
-                        latLng.latitude,
-                        latLng.longitude,
-                        1
-                    )
-                    sharedViewModel.geoCountryCode = address[0].countryCode
-                    Log.e("Step1Fragment", sharedViewModel.geoCountryCode)
+                    try {
+                        val response = task.result
+                        val latLng = response.placeLikelihoods[0].place.latLng!!
+                        val address = geoCoder.getFromLocation(
+                            latLng.latitude,
+                            latLng.longitude,
+                            1
+                        )
+                        sharedViewModel.geoCountryCode = address[0].countryCode
+                        Log.e("Step1Fragment", sharedViewModel.geoCountryCode)
+                    } catch (exception: IOException) {
+                        Log.e("Step1Fragment", "getFromLocation FAILED")
+                    }
                 } else {
                     val exception = task.exception
                     if (exception is ApiException) {
