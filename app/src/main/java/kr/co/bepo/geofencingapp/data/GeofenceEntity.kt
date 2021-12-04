@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import kr.co.bepo.geofencingapp.util.Constants.DATABASE_TABLE_NAME
 
@@ -18,6 +19,7 @@ class GeofenceEntity(
     val radius: Float,
     val snapshot: Bitmap
 ) : Parcelable {
+    @IgnoredOnParcel
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0
 }

@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
+import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class NetworkListener : ConnectivityManager.NetworkCallback() {
@@ -17,12 +18,12 @@ class NetworkListener : ConnectivityManager.NetworkCallback() {
 
         var isConnected = false
 
-        connectivityManager.allNetworks.forEach { network ->
+        connectivityManager.activeNetwork.also { network ->
             val networkCapability = connectivityManager.getNetworkCapabilities(network)
             networkCapability?.let {
                 if (it.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
                     isConnected = true
-                    return@forEach
+                    return@also
                 }
             }
         }
